@@ -1,9 +1,9 @@
-class UserControllers {
+class UserController {
 
     constructor(formId){
 
         this.formId = document.getElementById(formId);
-        this.tableEl = document.getElementById(talbeId);
+        this.tableEl = document.getElementById(tableId);
 
         this.onSubmit();
     }
@@ -16,8 +16,54 @@ onSubmit(){
 
         event.preventDefault();   
 
-        this.addLine(this.getValues);
+        let values = this.getValues();
+
+        values.photo = "";
+
+        this.getPhoto().them(
+            (content)=>{
+
+            values.photo = content;
+            
+            this.addLine(this.getValues());
+
+        }, 
+            (e)=>{
+                console.error(e);
+        });
     });
+
+}
+
+getPhoto(){
+
+    return new Promise((resolve, reject)=>{
+
+        let fileReader = new FileReader();
+
+        let elements = [...this.formEl.elements].filter(item=>{
+    
+            if (item.name === 'photo') {
+                return item;
+            }
+    
+        });
+    
+        let file = elements [0].files[0];
+    
+        fileReader.onload = ()=>{
+    
+            resolve(fileReader.result);
+        };
+        fileReader.onerror = (e)=>{
+
+            reject(e);
+        };
+
+        fileReader.readAsDataURL(file);
+
+    });
+
 
 }
 
@@ -55,7 +101,7 @@ onSubmit(){
     
         this.tableEl.innerHTML = `
         <tr>
-             <td><img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm"></td>
+             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
              <td>${dataUser.name}</td>
              <td>${dataUser.email}</td>
              <td>${dataUser.admin}</td>
