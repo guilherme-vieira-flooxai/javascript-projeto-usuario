@@ -9,6 +9,7 @@ class UserController {
 
         this.onSubmit();
         this.onEdit();
+        this.selectAll();
     }
 
 onEdit(){
@@ -102,6 +103,8 @@ onSubmit(){
             (content)=>{
 
             values.photo = content;
+
+            this.insert(values);
             
             this.addLine(values);
 
@@ -200,6 +203,44 @@ getPhoto(formEl){
 
     }
 
+    getUsersStorage(){
+
+        let users = [];
+
+        if (localStorage.getItem("users")){
+            
+                users = JSON.parse(localStorage.getItem("users"));
+
+        }
+
+        return users;
+
+    }
+
+    selectAll(){
+
+        this.getUsersStorage();
+
+        users.forEach(dataUser=>{
+            let user = new User();
+
+            user.loadFromJSON(dataUser);
+
+            this.addLine(user);
+        })
+
+    }
+
+    insert(dataUser){
+
+        let users = this.getUsersStorage();
+
+        users.push(data);
+
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+
+
      addLine(dataUser){
     
         let tr = document.createElement('');
@@ -215,7 +256,7 @@ getPhoto(formEl){
              <td>${Utils.dateFormat(dataUser.register)}</td>
              <td>
              <button type="button" class="btn btn-primary btn-primary btn-xs btn-flat">Editar</button>
-             <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+             <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
             </td>
           </tr>   
         `;
@@ -230,6 +271,17 @@ getPhoto(formEl){
 
     
     addEventsTr(tr){
+
+        tr.querySelector("btn-delete").addEventListener('click', e=>{
+        
+            if (confirm("Deseja realmente excluir?")){
+
+                tr.remove();
+
+                this.updateCount();
+            }
+
+        });
 
         tr.querySelector("btn-edit").addEventListener('click', e=>{
 
